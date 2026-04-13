@@ -1,0 +1,38 @@
+{
+  "1": {
+    "id": "1",
+    "category_id": 1,
+    "name": "کۆمپیوتەر",
+    "expected_count": 100,
+    "actual_count": 98,
+    "notes": "Imported - -2",
+    "created_at": "2026-04-13T00:00:00"
+  },
+  "2": {
+    "id": "2",
+    "category_id": 2,
+    "name": "مۆبیلیات",
+    "expected_count": 100,
+    "actual_count": 99,
+    "notes": "Imported - -1",
+    "created_at": "2026-04-13T00:00:00"
+  },
+  "3": {
+    "id": "3",
+    "category_id": 3,
+    "name": "بارەگا",
+    "expected_count": 100,
+    "actual_count": 99,
+    "notes": "Imported - -1",
+    "created_at": "2026-04-13T00:00:00"
+  },
+  "4": {
+    "id": "4",
+    "category_id": 4,
+    "name": "بینا",
+    "expected_count": 100,
+    "actual_count": 98,
+    "notes": "Imported - -2",
+    "created_at": "2026-04-13T00:00:00"
+  }
+}

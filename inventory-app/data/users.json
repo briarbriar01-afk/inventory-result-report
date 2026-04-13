@@ -1,0 +1,29 @@
+{
+  "1": {
+    "id": 1,
+    "username": "superadmin",
+    "password_hash": "scrypt:32768:8:1$AOtEF1G5UEbxkiIv$99a89f0a8912b5cc8a7be33e609a8dc45f9ff018df077d8505684263ef31734f70ccb75b029faf8508463d575ca478ba05ccfd17b06ccc6ff20524e8f845bdad",
+    "is_admin": true,
+    "role": "superadmin"
+  },
+  "2": {
+    "id": 2,
+    "username": "admin",
+    "password_hash": "scrypt:32768:8:1$G6P4NDYMCaT4LHwG$7c34958d6b7ffbdeb2ff6ac7b217d4edac1d09a6a2304d03823d5d53d59c06e25c4e9d5f83541cb73d3212b2fba01c8bc137baae24897257f93acde6fc23a195",
+    "is_admin": true,
+    "role": "admin"
+  },
+  "3": {
+    "id": 3,
+    "username": "employee",
+    "password_hash": "scrypt:32768:8:1$UBy15k8iofVBkWKg$ca2d661e55ff7c38a8b133db95320c0b5d058c2a733576b0da97ed2f41d89ffc27f790b5d9384a7dfea7957941e9556c9405b04a1fa046f4d691cb2ca19fe165",
+    "is_admin": false,
+    "role": "employee"
+  },
+  "4": {
+    "id": 4,
+    "username": "Briar",
+    "password_hash": "scrypt:32768:8:1$OGwYX1QxtBcBbVGO$15d84cdd443e7d7390f3137631679ee02e3b874c20ffeba2c5582547f1ea5a715c7d9bc2d5379815ee3252c2740640b72d9b43342b32dbedd2ac13a98485f692",
+    "is_admin": false
+  }
+}

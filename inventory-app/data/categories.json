@@ -1,0 +1,22 @@
+{
+  "1": {
+    "id": 1,
+    "name": "کۆمپیوتەر",
+    "name_en": "Computers"
+  },
+  "2": {
+    "id": 2,
+    "name": "مۆبیلیات",
+    "name_en": "Vehicles"
+  },
+  "3": {
+    "id": 3,
+    "name": "بارەگا",
+    "name_en": "Warehouses"
+  },
+  "4": {
+    "id": 4,
+    "name": "بینا",
+    "name_en": "Buildings"
+  }
+}

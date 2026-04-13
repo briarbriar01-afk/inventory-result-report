@@ -1,0 +1,707 @@
+{% extends "base.html" %}
+{% block title %}ڕاپۆرتی جەردی کەل و پەل{% endblock %}
+
+{% block extra_css %}
+<style>
+    * { direction: rtl; }
+    
+    .report-container {
+        max-width: 210mm;
+        height: 297mm;
+        margin: 20px auto;
+        padding: 12mm;
+        background: white;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        overflow: hidden;
+        font-size: 12px;
+    }
+
+    .report-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        border-bottom: 2px solid #2C5AA0;
+        padding-bottom: 8px;
+        margin-bottom: 10px;
+    }
+
+    .org-info {
+        text-align: right;
+        font-size: 13px;
+        line-height: 1.6;
+        color: #2C5AA0;
+        font-weight: 600;
+    }
+
+    .logo {
+        height: 50px;
+        width: auto;
+    }
+
+    .header-title {
+        text-align: center;
+        flex-grow: 1;
+    }
+
+    .header-title h2 {
+        color: #2C5AA0;
+        font-weight: bold;
+        margin: 0;
+        font-size: 18px;
+    }
+
+    .header-title p {
+        color: #555;
+        margin: 2px 0;
+        font-size: 14px;
+    }
+
+    .info-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 8px;
+        font-size: 11px;
+    }
+
+    .info-field {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .info-field label {
+        font-weight: bold;
+        color: #2C5AA0;
+        min-width: 140px;
+    }
+
+    .info-field input {
+        flex-grow: 1;
+        border: none;
+        border-bottom: 1px solid #2C5AA0;
+        font-size: 12px;
+    }
+
+    .info-field input[readonly] {
+        background: transparent;
+    }
+
+    .responsible-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 8px;
+        font-size: 11px;
+    }
+
+    .responsible-box {
+        border: 1px solid #1a472a;
+        padding: 6px;
+        text-align: center;
+    }
+
+    .responsible-box label {
+        display: block;
+        font-weight: bold;
+        color: #1a472a;
+        margin-bottom: 4px;
+        font-size: 11px;
+    }
+
+    .responsible-box input {
+        width: 100%;
+        border: none;
+        border-bottom: 1px solid #2C5AA0;
+        font-size: 11px;
+        padding: 2px;
+    }
+
+    .summary-table {
+        width: 100%;
+        margin-bottom: 12px;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+
+    .summary-table th {
+        background: #2C5AA0;
+        color: white;
+        padding: 6px;
+        text-align: center;
+        border: 1px solid #2C5AA0;
+    }
+
+    .summary-table td {
+        padding: 6px;
+        text-align: center;
+        border: 1px solid #ddd;
+    }
+
+    .summary-table input {
+        width: 100%;
+        border: none;
+        text-align: center;
+        font-weight: bold;
+    }
+
+    .categories-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .category-box {
+        border: 2px solid #2C5AA0;
+        border-radius: 4px;
+        padding: 8px;
+    }
+
+    .category-box h6 {
+        background: #1a472a;
+        color: white;
+        margin: -8px -8px 6px -8px;
+        padding: 6px;
+        text-align: center;
+        font-size: 12px;
+    }
+
+    .category-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 4px;
+        font-size: 11px;
+    }
+
+    .category-row label {
+        min-width: 130px;
+        font-weight: 600;
+    }
+
+    .category-row input {
+        flex-grow: 1;
+        border: none;
+        border-bottom: 1px solid #333;
+        text-align: center;
+        padding: 2px;
+    }
+
+    .mini-chart {
+        margin-top: 8px;
+        padding: 12px;
+        background: linear-gradient(135deg, #f8fbff 0%, #f0f7ff 100%);
+        border-radius: 8px;
+        border: 1px solid #dde8f5;
+        box-shadow: 0 2px 6px rgba(44, 90, 160, 0.1);
+    }
+
+    .mini-chart canvas {
+        max-height: 120px !important;
+        min-height: 100px !important;
+    }
+
+    .signatures-section {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 5px;
+        margin-top: 8px;
+    }
+
+    .signature-box {
+        text-align: center;
+        font-size: 11px;
+    }
+
+    .signature-line {
+        border-top: 1px solid #333;
+        padding-top: 2px;
+        height: 25px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        margin-bottom: 2px;
+    }
+
+    .signature-label {
+        font-weight: bold;
+        color: #2C5AA0;
+        font-size: 10px;
+    }
+
+    .page-break {
+        page-break-after: always;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+        justify-content: center;
+    }
+
+    @media print {
+        * { margin: 0; padding: 0; }
+        body { margin: 0; padding: 0; background: white; overflow: auto; }
+        html { margin: 0; padding: 0; }
+        .navbar, .sidebar, .button-group { display: none !important; }
+        .container-fluid {
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+        .report-container {
+            max-width: 210mm;
+            height: 297mm;
+            margin: 0 auto;
+            padding: 15mm;
+            box-shadow: none;
+            page-break-after: always;
+        }
+        .page-break { page-break-after: always; }
+        input, textarea {
+            background: white !important;
+            border-color: #333 !important;
+            color: #000 !important;
+        }
+        h1, h2, h3, h4, h5, h6 { page-break-after: avoid; }
+        table { page-break-inside: avoid; }
+    }
+
+    .hidden-chart { display: block; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="button-group">
+    <button class="btn btn-success btn-sm" onclick="saveFormToServer()">💾 پاشکۆکی</button>
+    <button class="btn btn-primary btn-sm" onclick="window.print()">🖨️ چاپ</button>
+    <button class="btn btn-info btn-sm" onclick="generateCharts()">📊 نیشاندانی چارت</button>
+    <button class="btn btn-warning btn-sm" onclick="sendForm()">📤 ناردن بۆ سوپەر ئاداین</button>
+    <button class="btn btn-danger btn-sm" onclick="location.reload()">↻ نوێکردنەوە</button>
+</div>
+
+<div class="report-container">
+    <!-- ==================== SECTION 1: HEADER ==================== -->
+    <div class="report-header">
+        <div>
+            <img src="/static/images/image2.png" class="logo" alt="Logo">
+        </div>
+        <div class="header-title">
+            <h2>ڕاپۆرتی جەردی کەل و پەل</h2>
+        </div>
+        <div class="org-info">
+            <div>پارتی دیموکراتی کوردستان</div>
+            <div>مەکتەبی سیاسی</div>
+            <div>بەشی کارگێڕی و دارایی</div>
+        </div>
+    </div>
+
+    <!-- ==================== SECTION 2: INFORMATION ==================== -->
+    <div style="padding-bottom: 10px; border-bottom: 1px solid #ddd;">
+        <h6 style="color: #2C5AA0; font-weight: bold; margin-bottom: 8px;">زانیاری گشتی</h6>
+        
+        <div class="info-section">
+            <div class="info-field">
+                <label>ناوی ئۆرگان:</label>
+                <input type="text" id="org_name" value="پارتی دیموکراتی کوردستان">
+            </div>
+            <div class="info-field">
+                <label>ڕێکەوت:</label>
+                <input type="date" id="report_date">
+            </div>
+            <div class="info-field">
+                <label>ناوی ژمێریار:</label>
+                <input type="text" id="auditor_name">
+            </div>
+            <div class="info-field">
+                <label>کاتی دەستپێکردن:</label>
+                <input type="time" id="start_time">
+            </div>
+            <div class="info-field">
+                <label>کاتی کۆتایی:</label>
+                <input type="time" id="end_time">
+            </div>
+        </div>
+
+        <h6 style="color: #2C5AA0; font-weight: bold; margin: 8px 0;">بەرپرسیارانی جەردی ئۆرگان</h6>
+        <div class="responsible-section">
+            <div class="responsible-box">
+                <label>بەرپرسی یەکەمی ئۆرگان</label>
+                <input type="text" id="responsible_first" placeholder="ناو">
+                <input type="text" id="code_first" placeholder="کۆد" style="margin-top: 2px;">
+            </div>
+            <div class="responsible-box">
+                <label>بەرپرسی دارایی ئۆرگان</label>
+                <input type="text" id="responsible_finance" placeholder="ناو">
+                <input type="text" id="code_finance" placeholder="کۆد" style="margin-top: 2px;">
+            </div>
+            <div class="responsible-box">
+                <label>بەرپرسی موڵك و ماڵی ئۆرگان</label>
+                <input type="text" id="responsible_property" placeholder="ناو">
+                <input type="text" id="code_property" placeholder="کۆد" style="margin-top: 2px;">
+            </div>
+        </div>
+    <!-- ==================== SECTION 3: SUMMARY ==================== -->
+    <div style="padding: 10px 0; border-bottom: 1px solid #ddd;">
+        <h6 style="color: #2C5AA0; font-weight: bold; margin-bottom: 8px;">ئەنجامی گشتی جەرد</h6>
+        
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>کۆی ناو سیستەم</th>
+                    <th>کۆی ژمێردراو</th>
+                    <th>کۆی جیاوازی</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><input type="number" id="summary_system" readonly> </td>
+                    <td><input type="number" id="summary_counted" readonly> </td>
+                    <td><input type="number" id="summary_discrepancy" readonly style="color: red; font-weight: bold;"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ==================== SECTION 4: CATEGORIES WITH CHARTS ==================== -->
+    <div style="padding: 10px 0;">
+        <h6 style="color: #2C5AA0; font-weight: bold; margin-bottom: 8px;">ئەنجامی جەرد بە پێی بەشەکان</h6>
+        
+        <div class="categories-grid">
+            <!-- Computers -->
+            <div class="category-box">
+                <h6>🖥️ کۆمپیوتەر</h6>
+                <div class="category-row">
+                    <label>ناو سیستەم:</label>
+                    <input type="number" class="cat-system" data-cat="comp" value="100">
+                </div>
+                <div class="category-row">
+                    <label>ژمێردراو:</label>
+                    <input type="number" class="cat-counted" data-cat="comp" value="98">
+                </div>
+                <div class="category-row">
+                    <label style="color: red;">جیاوازی:</label>
+                    <input type="number" class="cat-disc" data-cat="comp" readonly style="color: red; font-weight: bold;">
+                </div>
+                <div class="mini-chart hidden-chart" id="chart-comp">
+                    <canvas"></canvas>
+                </div>
+            </div>
+
+            <!-- Vehicles -->
+            <div class="category-box">
+                <h6>🚗 مۆبیلیات</h6>
+                <div class="category-row">
+                    <label>ناو سیستەم:</label>
+                    <input type="number" class="cat-system" data-cat="mob" value="100">
+                </div>
+                <div class="category-row">
+                    <label>ژمێردراو:</label>
+                    <input type="number" class="cat-counted" data-cat="mob" value="99">
+                </div>
+                <div class="category-row">
+                    <label style="color: red;">جیاوازی:</label>
+                    <input type="number" class="cat-disc" data-cat="mob" readonly style="color: red; font-weight: bold;">
+                </div>
+                <div class="mini-chart hidden-chart" id="chart-mob">
+                    <canvas></canvas>
+                </div>
+            </div>
+
+            <!-- Warehouses -->
+            <div class="category-box">
+                <h6>🏠 بارەگا</h6>
+                <div class="category-row">
+                    <label>ناو سیستەم:</label>
+                    <input type="number" class="cat-system" data-cat="bar" value="100">
+                </div>
+                <div class="category-row">
+                    <label>ژمێردراو:</label>
+                    <input type="number" class="cat-counted" data-cat="bar" value="99">
+                </div>
+                <div class="category-row">
+                    <label style="color: red;">جیاوازی:</label>
+                    <input type="number" class="cat-disc" data-cat="bar" readonly style="color: red; font-weight: bold;">
+                </div>
+                <div class="mini-chart hidden-chart" id="chart-bar">
+                    <canvas></canvas>
+                </div>
+            </div>
+
+            <!-- Buildings -->
+            <div class="category-box">
+                <h6>🏢 بینا</h6>
+                <div class="category-row">
+                    <label>ناو سیستەم:</label>
+                    <input type="number" class="cat-system" data-cat="bin" value="100">
+                </div>
+                <div class="category-row">
+                    <label>ژمێردراو:</label>
+                    <input type="number" class="cat-counted" data-cat="bin" value="98">
+                </div>
+                <div class="category-row">
+                    <label style="color: red;">جیاوازی:</label>
+                    <input type="number" class="cat-disc" data-cat="bin" readonly style="color: red; font-weight: bold;">
+                </div>
+                <div class="mini-chart hidden-chart" id="chart-bin">
+                    <canvas></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SECTION 5: SIGNATURES ==================== -->
+    <div class="signatures-section">
+        <div class="signature-box">
+            <div class="signature-line"></div>
+            <div class="signature-label">ژمێریاری جەرد</div>
+        </div>
+        <div class="signature-box">
+            <div class="signature-line"></div>
+            <div class="signature-label">بەرپرسی دارایی ئۆرگان</div>
+        </div>
+        <div class="signature-box">
+            <div class="signature-line"></div>
+            <div class="signature-label">بەرپرسی یەکەمی ئۆرگان</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Set today's date
+    document.getElementById('report_date').valueAsDate = new Date();
+
+    // Auto-generate charts on page load
+    window.addEventListener('load', () => {
+        setTimeout(generateCharts, 500);
+    });
+
+    // Update calculations in real-time
+    function updateCalculations() {
+        let totalSys = 0, totalCnt = 0;
+        
+        document.querySelectorAll('.cat-system').forEach(input => {
+            const cat = input.dataset.cat;
+            const sys = parseInt(input.value) || 0;
+            const cnt = parseInt(document.querySelector(`.cat-counted[data-cat="${cat}"]`).value) || 0;
+            const disc = cnt - sys;
+            
+            totalSys += sys;
+            totalCnt += cnt;
+            document.querySelector(`.cat-disc[data-cat="${cat}"]`).value = disc;
+        });
+        
+        document.getElementById('summary_system').value = totalSys;
+        document.getElementById('summary_counted').value = totalCnt;
+        document.getElementById('summary_discrepancy').value = totalCnt - totalSys;
+    }
+
+    // Event listeners
+    document.querySelectorAll('.cat-system, .cat-counted').forEach(input => {
+        input.addEventListener('change', updateCalculations);
+    });
+
+    // Generate beautiful charts
+    function generateCharts() {
+        const categories = [
+            { name: 'کۆمپیوتەر', id: 'comp', icon: '🖥️' },
+            { name: 'مۆبیلیات', id: 'mob', icon: '🚗' },
+            { name: 'بارەگا', id: 'bar', icon: '🏠' },
+            { name: 'بینا', id: 'bin', icon: '🏢' }
+        ];
+
+        categories.forEach(cat => {
+            const sys = parseInt(document.querySelector(`.cat-system[data-cat="${cat.id}"]`).value) || 0;
+            const cnt = parseInt(document.querySelector(`.cat-counted[data-cat="${cat.id}"]`).value) || 0;
+            const diff = cnt - sys;
+            
+            const chartDiv = document.getElementById(`chart-${cat.id}`);
+            chartDiv.classList.remove('hidden-chart');
+            
+            const canvas = chartDiv.querySelector('canvas');
+            if (window.charts && window.charts[`chart-${cat.id}`]) {
+                window.charts[`chart-${cat.id}`].destroy();
+            }
+            
+            if (!window.charts) window.charts = {};
+            
+            const ctx = canvas.getContext('2d');
+            window.charts[`chart-${cat.id}`] = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['ناو سیستەم', 'ژمێردراو'],
+                    datasets: [{
+                        label: cat.name,
+                        data: [sys, cnt],
+                        backgroundColor: ['#2C5AA0', '#5B9FD9'],
+                        borderColor: ['#1a3f6e', '#3d7fb8'],
+                        borderWidth: 2,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'x',
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: Math.max(sys, cnt) * 1.3,
+                            ticks: {
+                                stepSize: 1,
+                                font: { size: 10 }
+                            },
+                            grid: { color: 'rgba(200, 200, 200, 0.2)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 8,
+                            titleFont: { size: 12 },
+                            bodyFont: { size: 11 },
+                            cornerRadius: 4
+                        },
+                        datalabels: {
+                            color: '#1a472a',
+                            font: { weight: 'bold', size: 10 }
+                        }
+                    }
+                }
+            });
+        });
+
+        alert('چارتەکان بە سەرکەوتیی نیشاندرا!');
+    }
+
+    // Save form data to server
+    function saveFormToServer() {
+        const formData = {
+            org_name: document.getElementById('org_name').value,
+            report_date: document.getElementById('report_date').value,
+            auditor_name: document.getElementById('auditor_name').value,
+            start_time: document.getElementById('start_time').value,
+            end_time: document.getElementById('end_time').value,
+            responsible_first: document.getElementById('responsible_first').value,
+            code_first: document.getElementById('code_first').value,
+            responsible_finance: document.getElementById('responsible_finance').value,
+            code_finance: document.getElementById('code_finance').value,
+            responsible_property: document.getElementById('responsible_property').value,
+            code_property: document.getElementById('code_property').value,
+            comp_system: document.querySelector('.cat-system[data-cat="comp"]').value,
+            comp_counted: document.querySelector('.cat-counted[data-cat="comp"]').value,
+            mob_system: document.querySelector('.cat-system[data-cat="mob"]').value,
+            mob_counted: document.querySelector('.cat-counted[data-cat="mob"]').value,
+            bar_system: document.querySelector('.cat-system[data-cat="bar"]').value,
+            bar_counted: document.querySelector('.cat-counted[data-cat="bar"]').value,
+            bin_system: document.querySelector('.cat-system[data-cat="bin"]').value,
+            bin_counted: document.querySelector('.cat-counted[data-cat="bin"]').value,
+            status: 'draft'
+        };
+        
+        fetch('/api/reports/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        })
+        .then(r => r.json())
+        .then(d => {
+            alert('فۆرم بە سەرکەوتوویی پاشکۆ کرا!');
+            localStorage.setItem('lastReportId', d.id);
+        })
+        .catch(e => {
+            console.error(e);
+            alert('هەڵە لە پاشکۆکردنی فۆرم!');
+        });
+    }
+
+    // Send form to superadmin
+    function sendForm() {
+        const formData = {
+            org_name: document.getElementById('org_name').value,
+            report_date: document.getElementById('report_date').value,
+            auditor_name: document.getElementById('auditor_name').value,
+            start_time: document.getElementById('start_time').value,
+            end_time: document.getElementById('end_time').value,
+            responsible_first: document.getElementById('responsible_first').value,
+            code_first: document.getElementById('code_first').value,
+            responsible_finance: document.getElementById('responsible_finance').value,
+            code_finance: document.getElementById('code_finance').value,
+            responsible_property: document.getElementById('responsible_property').value,
+            code_property: document.getElementById('code_property').value,
+            comp_system: document.querySelector('.cat-system[data-cat="comp"]').value,
+            comp_counted: document.querySelector('.cat-counted[data-cat="comp"]').value,
+            mob_system: document.querySelector('.cat-system[data-cat="mob"]').value,
+            mob_counted: document.querySelector('.cat-counted[data-cat="mob"]').value,
+            bar_system: document.querySelector('.cat-system[data-cat="bar"]').value,
+            bar_counted: document.querySelector('.cat-counted[data-cat="bar"]').value,
+            bin_system: document.querySelector('.cat-system[data-cat="bin"]').value,
+            bin_counted: document.querySelector('.cat-counted[data-cat="bin"]').value,
+            status: 'submitted'
+        };
+        
+        fetch('/api/reports/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        })
+        .then(r => r.json())
+        .then(d => {
+            if(d.success) {
+                alert('فۆرم بە سەرکەوتوویی ناردرا بۆ سوپەر ئاداین!');
+                location.reload();
+            } else {
+                alert('هەڵە لە ناردنی فۆرم!');
+            }
+        })
+        .catch(e => {
+            console.error(e);
+            alert('هەڵە لە پەیوەندی سەرڤەر!');
+        });
+    }
+
+    // Save form data to localStorage (backup)
+    function saveForm() {
+        const formData = {
+            org_name: document.getElementById('org_name').value,
+            report_date: document.getElementById('report_date').value,
+            auditor_name: document.getElementById('auditor_name').value,
+            start_time: document.getElementById('start_time').value,
+            end_time: document.getElementById('end_time').value,
+            responsible_first: document.getElementById('responsible_first').value,
+            code_first: document.getElementById('code_first').value,
+            responsible_finance: document.getElementById('responsible_finance').value,
+            code_finance: document.getElementById('code_finance').value,
+            responsible_property: document.getElementById('responsible_property').value,
+            code_property: document.getElementById('code_property').value,
+            comp_system: document.querySelector('.cat-system[data-cat="comp"]').value,
+            comp_counted: document.querySelector('.cat-counted[data-cat="comp"]').value,
+            mob_system: document.querySelector('.cat-system[data-cat="mob"]').value,
+            mob_counted: document.querySelector('.cat-counted[data-cat="mob"]').value,
+            bar_system: document.querySelector('.cat-system[data-cat="bar"]').value,
+            bar_counted: document.querySelector('.cat-counted[data-cat="bar"]').value,
+            bin_system: document.querySelector('.cat-system[data-cat="bin"]').value,
+            bin_counted: document.querySelector('.cat-counted[data-cat="bin"]').value
+        };
+        
+        localStorage.setItem('inventoryReport_' + new Date().getTime(), JSON.stringify(formData));
+        alert('فۆرم بە بێ ئێنتەرنێت پاشکۆ کرا!');
+    }
+
+    // Download PDF function (redirects to print)
+    function downloadPDF() {
+        alert('لە هەندێ چرکەی تێدا PDF درا دەبێت!');
+        setTimeout(() => window.print(), 500);
+    }
+
+    // Initial calculation
+    updateCalculations();
+</script>
+{% endblock %}

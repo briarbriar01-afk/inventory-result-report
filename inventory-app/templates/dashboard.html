@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Inventory{% endblock %}
+{% block content %}
+<h2 class="mb-4">📊 Dashboard</h2>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="stat-card"><h6>Total Items</h6><h3>{{ stats.total_items }}</h3></div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card"><h6>Categories</h6><h3>{{ stats.total_categories }}</h3></div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card"><h6>Expected Total</h6><h3>{{ stats.total_expected }}</h3></div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card"><h6>Discrepancy</h6><h3>{{ stats.total_discrepancy }}</h3></div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h5>Expected vs Actual</h5>
+            <canvas id="comparisonChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h5>Discrepancies</h5>
+            <canvas id="discrepancyChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="card p-4 mt-4">
+    <h5>By Category</h5>
+    <table class="table table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Category</th>
+                <th>Items</th>
+                <th>Expected</th>
+                <th>Actual</th>
+                <th>Discrepancy</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cat_id, category in categories.items() %}
+            {% set cat_items = items.values() | selectattr('category_id', 'equalto', category.id | int) | list %}
+            <tr>
+                <td>{{ category.name }}</td>
+                <td>{{ cat_items | length }}</td>
+                <td>{{ cat_items | map(attribute='expected_count') | sum(start=0) }}</td>
+                <td>{{ cat_items | map(attribute='actual_count') | sum(start=0) }}</td>
+                <td><span class="badge bg-danger">{{ cat_items | map(attribute='actual_count') | sum(start=0) - cat_items | map(attribute='expected_count') | sum(start=0) }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    fetch('/api/reports/data')
+        .then(r => r.json())
+        .then(data => {
+            new Chart(document.getElementById('comparisonChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        { label: 'Expected', data: data.expected, backgroundColor: '#4472C4' },
+                        { label: 'Actual', data: data.actual, backgroundColor: '#70AD47' }
+                    ]
+                },
+                options: { responsive: true, scales: { y: { beginAtZero: true } } }
+            });
+            
+            new Chart(document.getElementById('discrepancyChart'), {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Discrepancy',
+                        data: data.discrepancy,
+                        borderColor: '#C5504B',
+                        backgroundColor: 'rgba(197, 80, 75, 0.1)',
+                        tension: 0.3,
+                        fill: true,
+                    }]
+                },
+                options: { responsive: true, scales: { y: { beginAtZero: true } } }
+            });
+        });
+</script>
+{% endblock %}

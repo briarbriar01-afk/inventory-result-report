@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+{% block title %}Generate Report - Inventory{% endblock %}
+{% block content %}
+<h2 class="mb-4">📄 Generate Inventory Report</h2>
+
+<div class="card p-4">
+    <form id="reportForm">
+        <!-- Header Information -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">معلومات التقرير (Report Information)</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">ناوی ئۆرگان (Organization Name)</label>
+                        <input type="text" class="form-control" id="org_name" value="پارتی دیموکراتی کوردستان - مەکتەبی سیاسی">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">ناوی ژمێریار (Auditor Name)</label>
+                        <input type="text" class="form-control" id="auditor_name">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">ڕێکەوت (Date)</label>
+                        <input type="date" class="form-control" id="report_date">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">کاتژمێری دەست پێکردن (Start Time)</label>
+                        <input type="time" class="form-control" id="start_time">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">کاتژمێری کۆیایی هاتن (End Time)</label>
+                        <input type="time" class="form-control" id="end_time">
+                    </div>
+                </div>
+
+                <hr>
+                <h6 class="mb-3">بەرپرسیاکان (Responsible People)</h6>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">ناوی بەرپرسی یەکەمی ئۆرگان (First Responsible)</label>
+                        <input type="text" class="form-control" id="responsible_first">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">کۆدی حزبی (Party Code)</label>
+                        <input type="text" class="form-control" id="code_first" placeholder="e.g., 001">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">ناوی بەرپرسی دارایی ئۆرگان (Financial Responsible)</label>
+                        <input type="text" class="form-control" id="responsible_finance">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">کۆدی حزبی (Party Code)</label>
+                        <input type="text" class="form-control" id="code_finance" placeholder="e.g., 002">
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">ناوی بەرپرسی موڵك و ماڵی ئۆرگان (Property Responsible)</label>
+                        <input type="text" class="form-control" id="responsible_property">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">کۆدی حزبی (Party Code)</label>
+                        <input type="text" class="form-control" id="code_property" placeholder="e.g., 003">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Table -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">خلاصة الجرد (Inventory Summary)</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>کۆی کەل و پەلی ناو سیستەم (System Count)</th>
+                            <th>کۆی کەل و پەلی ژمێردراو (Counted)</th>
+                            <th>کۆی جیاوازی (Discrepancy)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <input type="number" class="form-control" id="summary_system" placeholder="auto-calculated" readonly style="background-color: #f0f0f0;">
+                            </td>
+                            <td>
+                                <input type="number" class="form-control" id="summary_counted" placeholder="auto-calculated" readonly style="background-color: #f0f0f0;">
+                            </td>
+                            <td>
+                                <input type="number" class="form-control" id="summary_discrepancy" placeholder="auto-calculated" readonly style="background-color: #f0f0f0;">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Category Details -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">تفاصيل الفئات (Category Details)</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Computer Assets -->
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded mb-3">
+                            <h6 class="text-primary mb-3">🖥️ کەل و پەلی کۆمپیوتەر (Computers)</h6>
+                            <div class="mb-2">
+                                <label class="form-label">کەل و پەلی ناو سیستەم (System Count)</label>
+                                <input type="number" class="form-control cat-system" data-category="1" value="100">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">کەل و پەلی ژمێردراو (Counted)</label>
+                                <input type="number" class="form-control cat-counted" data-category="1" value="98">
+                            </div>
+                            <div>
+                                <label class="form-label">جیاوازی (Discrepancy)</label>
+                                <input type="number" class="form-control cat-discrepancy" data-category="1" readonly style="background-color: #f0f0f0;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vehicle Assets -->
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded mb-3">
+                            <h6 class="text-primary mb-3">🚗 کەل و پەلی مۆبیلیات (Vehicles)</h6>
+                            <div class="mb-2">
+                                <label class="form-label">کەل و پەلی ناو سیستەم (System Count)</label>
+                                <input type="number" class="form-control cat-system" data-category="2" value="100">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">کەل و پەلی ژمێردراو (Counted)</label>
+                                <input type="number" class="form-control cat-counted" data-category="2" value="99">
+                            </div>
+                            <div>
+                                <label class="form-label">جیاوازی (Discrepancy)</label>
+                                <input type="number" class="form-control cat-discrepancy" data-category="2" readonly style="background-color: #f0f0f0;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Warehouse Assets -->
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded mb-3">
+                            <h6 class="text-primary mb-3">🏠 کەل و پەلی ناو بارەگا (Warehouses)</h6>
+                            <div class="mb-2">
+                                <label class="form-label">کەل و پەلی ناو سیستەم (System Count)</label>
+                                <input type="number" class="form-control cat-system" data-category="3" value="100">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">کەل و پەلی ژمێردراو (Counted)</label>
+                                <input type="number" class="form-control cat-counted" data-category="3" value="99">
+                            </div>
+                            <div>
+                                <label class="form-label">جیاوازی (Discrepancy)</label>
+                                <input type="number" class="form-control cat-discrepancy" data-category="3" readonly style="background-color: #f0f0f0;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Building Assets -->
+                    <div class="col-md-6">
+                        <div class="p-3 border rounded mb-3">
+                            <h6 class="text-primary mb-3">🏢 کەل و پەلی ناو بینا (Buildings)</h6>
+                            <div class="mb-2">
+                                <label class="form-label">کەل و پەلی ناو سیستەم (System Count)</label>
+                                <input type="number" class="form-control cat-system" data-category="4" value="100">
+                            </div>
+                            <div class="mb-2">
+                                <label class="form-label">کەل و پەلی ژمێردراو (Counted)</label>
+                                <input type="number" class="form-control cat-counted" data-category="4" value="98">
+                            </div>
+                            <div>
+                                <label class="form-label">جیاوازی (Discrepancy)</label>
+                                <input type="number" class="form-control cat-discrepancy" data-category="4" readonly style="background-color: #f0f0f0;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signatures Section -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0">التوقيعات (Signatures)</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mt-5">
+                    <div class="col-md-4 text-center">
+                        <div style="border-top: 2px solid #000; padding-top: 10px;">
+                            <strong>ژمێریاری جەرد</strong><br>
+                            <small>(Inventory Auditor)</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div style="border-top: 2px solid #000; padding-top: 10px;">
+                            <strong>بەرپرسی دارایی ئۆرگان</strong><br>
+                            <small>(Financial Responsible)</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div style="border-top: 2px solid #000; padding-top: 10px;">
+                            <strong>بەرپرسی یەکەمی ئۆرگان</strong><br>
+                            <small>(First Responsible)</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="d-flex gap-2 mb-4">
+            <button type="button" class="btn btn-primary" onclick="generatePDF()">📄 Generate PDF Report</button>
+            <button type="button" class="btn btn-success" onclick="generateChart()">📊 View Charts</button>
+            <button type="button" class="btn btn-info" onclick="printForm()">🖨️ Print</button>
+            <button type="reset" class="btn btn-secondary">↻ Reset</button>
+        </div>
+    </form>
+</div>
+
+<!-- Chart Modal -->
+<div class="modal fade" id="chartModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">📊 Inventory Charts</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <canvas id="reportChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Set today's date
+    document.getElementById('report_date').valueAsDate = new Date();
+
+    // Update discrepancies when values change
+    function updateCalculations() {
+        let totalSystem = 0;
+        let totalCounted = 0;
+
+        document.querySelectorAll('.cat-system').forEach(input => {
+            const catId = input.dataset.category;
+            const system = parseInt(input.value) || 0;
+            const counted = parseInt(document.querySelector(`.cat-counted[data-category="${catId}"]`).value) || 0;
+            const discrepancy = counted - system;
+
+            totalSystem += system;
+            totalCounted += counted;
+
+            document.querySelector(`.cat-discrepancy[data-category="${catId}"]`).value = discrepancy;
+        });
+
+        document.getElementById('summary_system').value = totalSystem;
+        document.getElementById('summary_counted').value = totalCounted;
+        document.getElementById('summary_discrepancy').value = totalCounted - totalSystem;
+    }
+
+    // Event listeners
+    document.querySelectorAll('.cat-system, .cat-counted').forEach(input => {
+        input.addEventListener('change', updateCalculations);
+    });
+
+    // Generate Chart
+    function generateChart() {
+        const categories = ['کۆمپیوتەر', 'مۆبیلیات', 'بارەگا', 'بینا'];
+        const systemCounts = [];
+        const countedCounts = [];
+
+        for (let i = 1; i <= 4; i++) {
+            systemCounts.push(parseInt(document.querySelector(`.cat-system[data-category="${i}"]`).value) || 0);
+            countedCounts.push(parseInt(document.querySelector(`.cat-counted[data-category="${i}"]`).value) || 0);
+        }
+
+        const ctx = document.createElement('canvas');
+        const modal = new bootstrap.Modal(document.getElementById('chartModal'));
+        
+        const oldCanvas = document.getElementById('reportChart');
+        oldCanvas.remove();
+        document.querySelector('.modal-body').appendChild(ctx);
+        ctx.id = 'reportChart';
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: categories,
+                datasets: [
+                    {
+                        label: 'System Count (ناو سیستەم)',
+                        data: systemCounts,
+                        backgroundColor: '#4472C4'
+                    },
+                    {
+                        label: 'Counted (ژمێردراو)',
+                        data: countedCounts,
+                        backgroundColor: '#70AD47'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        modal.show();
+    }
+
+    // Print function
+    function printForm() {
+        window.print();
+    }
+
+    // Generate PDF (placeholder - would need additional library)
+    function generatePDF() {
+        alert('📄 PDF generation feature coming soon!\nFor now, use Print to PDF from your browser.');
+        printForm();
+    }
+
+    // Initial calculation
+    updateCalculations();
+</script>
+
+<style>
+    @media print {
+        .navbar, .sidebar, .btn, button { display: none !important; }
+        body { margin: 0; padding: 20px; }
+        .card { page-break-inside: avoid; }
+    }
+</style>
+{% endblock %}

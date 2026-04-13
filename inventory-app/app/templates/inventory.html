@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory - Inventory System{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>📋 Inventory Items</h2>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addItemModal">+ Add Item</button>
+</div>
+
+<div class="card p-4">
+    <div class="table-responsive">
+        <table class="table table-hover" id="inventoryTable">
+            <thead class="table-light">
+                <tr>
+                    <th>Category</th>
+                    <th>Item Name</th>
+                    <th>Expected</th>
+                    <th>Actual</th>
+                    <th>Discrepancy</th>
+                    <th>Notes</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="itemsTableBody">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Add Item Modal -->
+<div class="modal fade" id="addItemModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addItemForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="category_id" class="form-label">Category</label>
+                        <select class="form-control" id="category_id" required>
+                            <option>Select Category</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Item Name</label>
+                        <input type="text" class="form-control" id="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="expected_count" class="form-label">Expected Count</label>
+                        <input type="number" class="form-control" id="expected_count" value="0">
+                    </div>
+                    <div class="mb-3">
+                        <label for="actual_count" class="form-label">Actual Count</label>
+                        <input type="number" class="form-control" id="actual_count" value="0">
+                    </div>
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="notes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Item Modal -->
+<div class="modal fade" id="editItemModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editItemForm">
+                <input type="hidden" id="edit_item_id">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit_expected_count" class="form-label">Expected Count</label>
+                        <input type="number" class="form-control" id="edit_expected_count" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_actual_count" class="form-label">Actual Count</label>
+                        <input type="number" class="form-control" id="edit_actual_count" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_notes" class="form-label">Notes</label>
+                        <textarea class="form-control" id="edit_notes" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table-icon { width: 20px; height: 20px; }
+</style>
+
+<script>
+    const addItemModal = new bootstrap.Modal(document.getElementById('addItemModal'));
+    const editItemModal = new bootstrap.Modal(document.getElementById('editItemModal'));
+    
+    // Load categories
+    function loadCategories() {
+        fetch('/api/categories')
+            .then(r => r.json())
+            .then(categories => {
+                const select = document.getElementById('category_id');
+                select.innerHTML = '<option>Select Category</option>';
+                categories.forEach(cat => {
+                    select.innerHTML += `<option value="${cat.id}">${cat.name}</option>`;
+                });
+            });
+    }
+    
+    // Load items
+    function loadItems() {
+        fetch('/api/items')
+            .then(r => r.json())
+            .then(items => {
+                const tbody = document.getElementById('itemsTableBody');
+                tbody.innerHTML = '';
+                items.forEach(item => {
+                    const discColor = item.discrepancy === 0 ? 'success' : item.discrepancy > 0 ? 'info' : 'danger';
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${item.category}</td>
+                            <td>${item.name}</td>
+                            <td>${item.expected_count}</td>
+                            <td>${item.actual_count}</td>
+                            <td><span class="badge bg-${discColor}">${item.discrepancy}</span></td>
+                            <td>${item.notes || '-'}</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" onclick="editItem(${item.id}, ${item.expected_count}, ${item.actual_count}, '${item.notes || ''}')">✏️</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteItem(${item.id})">🗑️</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+    }
+    
+    // Add item
+    document.getElementById('addItemForm').addEventListener('submit', e => {
+        e.preventDefault();
+        
+        fetch('/api/items', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                category_id: document.getElementById('category_id').value,
+                name: document.getElementById('name').value,
+                expected_count: parseInt(document.getElementById('expected_count').value),
+                actual_count: parseInt(document.getElementById('actual_count').value),
+                notes: document.getElementById('notes').value,
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                addItemModal.hide();
+                document.getElementById('addItemForm').reset();
+                loadItems();
+            }
+        });
+    });
+    
+    // Edit item
+    function editItem(id, expected, actual, notes) {
+        document.getElementById('edit_item_id').value = id;
+        document.getElementById('edit_expected_count').value = expected;
+        document.getElementById('edit_actual_count').value = actual;
+        document.getElementById('edit_notes').value = notes;
+        editItemModal.show();
+    }
+    
+    document.getElementById('editItemForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const id = document.getElementById('edit_item_id').value;
+        
+        fetch(`/api/items/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                expected_count: parseInt(document.getElementById('edit_expected_count').value),
+                actual_count: parseInt(document.getElementById('edit_actual_count').value),
+                notes: document.getElementById('edit_notes').value,
+            })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                editItemModal.hide();
+                loadItems();
+            }
+        });
+    });
+    
+    // Delete item
+    function deleteItem(id) {
+        if (confirm('Are you sure?')) {
+            fetch(`/api/items/${id}`, { method: 'DELETE' })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) loadItems();
+                });
+        }
+    }
+    
+    // Initialize
+    loadCategories();
+    loadItems();
+</script>
+{% endblock %}

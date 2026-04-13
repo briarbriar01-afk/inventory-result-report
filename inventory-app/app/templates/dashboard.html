@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Inventory System{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">📊 Dashboard</h2>
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h6 class="text-uppercase">Total Items</h6>
+            <h3>{{ stats.total_items }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h6 class="text-uppercase">Categories</h6>
+            <h3>{{ stats.total_categories }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h6 class="text-uppercase">Expected Total</h6>
+            <h3>{{ stats.total_expected }}</h3>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <h6 class="text-uppercase">Discrepancy</h6>
+            <h3>{{ stats.total_discrepancy }}</h3>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h5 class="card-title">Expected vs Actual</h5>
+            <canvas id="comparisonChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h5 class="card-title">Discrepancies by Category</h5>
+            <canvas id="discrepancyChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card p-4">
+            <h5 class="card-title">Recent Items by Category</h5>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Category</th>
+                            <th>Items</th>
+                            <th>Expected</th>
+                            <th>Actual</th>
+                            <th>Discrepancy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in categories %}
+                        <tr>
+                            <td>{{ category.name }}</td>
+                            <td>{{ category.items|length }}</td>
+                            <td>
+                                {% set expected = category.items|map(attribute='expected_count')|sum|default(0) %}
+                                {{ expected }}
+                            </td>
+                            <td>
+                                {% set actual = category.items|map(attribute='actual_count')|sum|default(0) %}
+                                {{ actual }}
+                            </td>
+                            <td>
+                                {% set discrepancy = actual - expected %}
+                                <span class="badge {% if discrepancy == 0 %}bg-success{% elif discrepancy > 0 %}bg-info{% else %}bg-danger{% endif %}">
+                                    {{ discrepancy }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    fetch('/api/reports/data')
+        .then(r => r.json())
+        .then(data => {
+            // Expected vs Actual Chart
+            const ctx1 = document.getElementById('comparisonChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Expected',
+                            data: data.expected,
+                            backgroundColor: '#4472C4',
+                        },
+                        {
+                            label: 'Actual',
+                            data: data.actual,
+                            backgroundColor: '#70AD47',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+            
+            // Discrepancy Chart
+            const ctx2 = document.getElementById('discrepancyChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Discrepancy',
+                        data: data.discrepancy,
+                        borderColor: '#C5504B',
+                        backgroundColor: 'rgba(197, 80, 75, 0.1)',
+                        tension: 0.3,
+                        fill: true,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        });
+</script>
+{% endblock %}
